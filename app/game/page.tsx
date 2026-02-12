@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 
 interface Card {
   id: number
@@ -319,14 +318,13 @@ function Card({ card, onClick }: { card: Card; onClick: () => void }) {
           </div>
 
           {/* Front of card */}
-          <div className="card-face card-front bg-white rounded-xl shadow-lg border-4 border-pink-200 flex items-center justify-center overflow-hidden">
+          <div className="card-face card-front bg-white rounded-xl shadow-lg border-4 border-pink-200 flex items-center justify-center overflow-hidden relative">
             {card.imageUrl ? (
-              <Image
+              <img
                 src={card.imageUrl}
                 alt="Memory card"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100px, 150px"
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
               />
             ) : (
               <span className="text-4xl md:text-5xl heartbeat">{card.emoji}</span>
