@@ -42,10 +42,10 @@ export default function GamePage() {
   }, [])
 
   const generateCards = (imageUrls: string[]) => {
-    // For 4x4 grid, we need 8 pairs (16 cards total)
-    // Take first 8 images or shuffle and take 8
+    // For 3x3 grid, we need 4 pairs (8 cards total, 1 empty space)
+    // Shuffle all images and take 4 (can repeat between games, but shuffle each time)
     const shuffledImages = [...imageUrls].sort(() => Math.random() - 0.5)
-    const selectedImages = shuffledImages.slice(0, 8)
+    const selectedImages = shuffledImages.slice(0, 4)
     const cardPairs: Card[] = []
 
     for (let i = 0; i < selectedImages.length; i++) {
@@ -86,15 +86,15 @@ export default function GamePage() {
   }
 
   const startGame = () => {
-    const gridSize = 4 // Fixed 4x4 grid
+    const gridSize = 3 // Fixed 3x3 grid (8 cards = 4 pairs, 1 empty space)
     setGridSize(gridSize)
     
     if (images.length > 0) {
-      // Use images - shuffle them each time
+      // Use images - shuffle and select 4 random images each time (can repeat)
       setCards(generateCards(images))
     } else {
       // Fallback to emojis
-      setCards(generateCardsWithEmojis((gridSize * gridSize) / 2))
+      setCards(generateCardsWithEmojis(4)) // 4 pairs for 3x3 grid
     }
     setFlippedCards([])
     setMoves(0)
@@ -132,8 +132,8 @@ export default function GamePage() {
           setFlippedCards([])
           setMatches((prevMatches) => {
             const newMatches = prevMatches + 1
-            // Check if game is won
-            if (newMatches === (gridSize! * gridSize!) / 2) {
+            // Check if game is won (4 pairs for 3x3 grid)
+            if (newMatches === 4) {
               setGameWon(true)
             }
             return newMatches
@@ -174,16 +174,16 @@ export default function GamePage() {
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border-4 border-pink-200 max-w-md mx-auto">
               <div className="text-6xl mb-4">💕</div>
               <div className="text-2xl font-bold text-red-500 mb-2">
-                4x4
+                3x3
               </div>
               <div className="text-pink-600 mb-2">
-                8 parov slik
+                4 para slik
               </div>
               <div className="text-sm text-pink-500 mb-6">
-                (Iz {images.length} slik se bo izbralo 8 naključnih)
+                (Iz {images.length} slik se bo izbralo 4 naključne)
               </div>
               <button
-                onClick={startGame}
+                onClick={() => startGame()}
                 className="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-lg"
               >
                 Začni igro
@@ -240,14 +240,8 @@ export default function GamePage() {
           </p>
           <div className="flex gap-4 justify-center mt-8">
             <button
-              onClick={startGame}
-              className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-lg"
-            >
-              Igraj ponovno
-            </button>
-            <button
               onClick={() => setGridSize(null)}
-              className="bg-white border-4 border-pink-300 text-pink-600 px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-lg"
+              className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-lg"
             >
               Nova igra
             </button>
@@ -275,7 +269,7 @@ export default function GamePage() {
             </div>
             <div className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2 border-2 border-pink-200">
               <span className="text-red-500 font-bold">Pari: </span>
-              <span className="text-pink-600">{matches}/{(gridSize * gridSize) / 2}</span>
+              <span className="text-pink-600">{matches}/4</span>
             </div>
           </div>
         </div>
@@ -285,7 +279,7 @@ export default function GamePage() {
           className="grid gap-3 md:gap-4 mx-auto"
           style={{
             gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-            maxWidth: `${gridSize * 100}px`,
+            maxWidth: `${gridSize * 120}px`, // Larger cards for 3x3
           }}
         >
           {cards.map((card, index) => (
@@ -295,6 +289,10 @@ export default function GamePage() {
               onClick={() => handleCardClick(index)}
             />
           ))}
+          {/* Empty space for 3x3 grid (9 positions, 8 cards) */}
+          {gridSize === 3 && cards.length === 8 && (
+            <div style={{ aspectRatio: '1' }} className="opacity-0 pointer-events-none" />
+          )}
         </div>
       </div>
     </div>
