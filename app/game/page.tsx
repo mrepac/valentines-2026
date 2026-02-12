@@ -302,6 +302,8 @@ export default function GamePage() {
 }
 
 function Card({ card, onClick }: { card: Card; onClick: () => void }) {
+  const [imageError, setImageError] = useState(false)
+
   return (
     <div
       className={`relative cursor-pointer transition-transform duration-300 hover:scale-105 ${
@@ -319,15 +321,16 @@ function Card({ card, onClick }: { card: Card; onClick: () => void }) {
 
           {/* Front of card */}
           <div className="card-face card-front bg-white rounded-xl shadow-lg border-4 border-pink-200 flex items-center justify-center overflow-hidden relative">
-            {card.imageUrl ? (
+            {card.imageUrl && !imageError ? (
               <img
                 src={card.imageUrl}
                 alt="Memory card"
                 className="absolute inset-0 w-full h-full object-cover"
                 loading="lazy"
+                onError={() => setImageError(true)}
               />
             ) : (
-              <span className="text-4xl md:text-5xl heartbeat">{card.emoji}</span>
+              <span className="text-4xl md:text-5xl heartbeat">{card.emoji || '💖'}</span>
             )}
           </div>
         </div>

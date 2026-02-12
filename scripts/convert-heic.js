@@ -36,11 +36,19 @@ function convertHeicToPng() {
         // Try using sips on macOS
         if (process.platform === 'darwin') {
           try {
-            execSync(`sips -s format png "${heicPath}" --out "${pngPath}"`, { stdio: 'ignore' })
-            console.log(`✓ Successfully converted ${heicFile} to ${pngFile}`)
+            execSync(`sips -s format png "${heicPath}" --out "${pngPath}"`, { 
+              stdio: 'pipe',
+              encoding: 'utf8'
+            })
+            // Verify the file was created and has content
+            if (fs.existsSync(pngPath) && fs.statSync(pngPath).size > 0) {
+              console.log(`✓ Successfully converted ${heicFile} to ${pngFile}`)
+            } else {
+              throw new Error('Conversion produced empty file')
+            }
           } catch (sipsError) {
-            console.error(`✗ Error converting ${heicFile} with sips. Please convert manually.`)
-            console.error(`  You can use: sips -s format png "${heicPath}" --out "${pngPath}"`)
+            console.error(`✗ Error converting ${heicFile} with sips:`, sipsError.message)
+            console.error(`  Please convert manually: sips -s format png "${heicPath}" --out "${pngPath}"`)
           }
         } else {
           console.error(`✗ Automatic conversion not available on ${process.platform}`)

@@ -14,24 +14,13 @@ export async function GET() {
     // Read directory
     const files = fs.readdirSync(imagesDirectory)
     
-    // Filter for image files (exclude HEIC, prefer PNG if both exist)
+    // Filter for image files
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
     const imageFiles = files
       .filter(file => {
         const ext = path.extname(file).toLowerCase()
-        const baseName = file.toLowerCase()
-        // Exclude HEIC files and .gitkeep
-        if (baseName.endsWith('.heic') || file === '.gitkeep') {
-          return false
-        }
-        // If PNG exists, exclude corresponding HEIC
-        if (baseName.endsWith('.png')) {
-          const heicName = baseName.replace('.png', '.heic')
-          if (files.some(f => f.toLowerCase() === heicName)) {
-            return true // Include PNG
-          }
-        }
-        return imageExtensions.includes(ext)
+        // Exclude .gitkeep and non-image files
+        return file !== '.gitkeep' && imageExtensions.includes(ext)
       })
       .map(file => `/images/${file}`)
       .sort()
